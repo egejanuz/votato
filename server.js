@@ -23,7 +23,7 @@ const io = require("socket.io")(server);
 // Mongoose Instantiation //
 const mongoose = require('mongoose');
 const random = require('mongoose-simple-random');
-mongoose.connect('mongodb://127.0.0.1:27017/votato');
+mongoose.connect('mongodb://enkomaun:hwxhm&=*KTbV49&E@ds038319.mlab.com:38319/votato-db');
 mongoose.connection.on('error', console.error.bind(console, 'connection error'));
 
 
