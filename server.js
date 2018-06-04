@@ -23,7 +23,7 @@ const io = require("socket.io")(server);
 // Mongoose Instantiation //
 const mongoose = require('mongoose');
 const random = require('mongoose-simple-random');
-const MONGOLAB_URI;
+const MONGOLAB_URI = process.env.MONGOLAB_URI;
 mongoose.connect(MONGOLAB_URI);
 mongoose.connection.on('error', console.error.bind(console, 'connection error'));
 
