@@ -452,14 +452,36 @@ let tallyVotes = function() {
 	if (!(votesForA === 0 && votesForB === 0)) {
 		winningOption = (votesForA > votesForB) ? "firstOption" : "secondOption";
 		let majorityVotes = (votesForA > votesForB) ? votesForA : votesForB;
-		io.sockets.emit('vote_finished', {
-			winningOption: winningOption , 
-			voteCount: voteCount,
-			majorityVotes: majorityVotes
-		});
 	}
 	votesForA = 0;
 	votesForB = 0;	
+	
+	let result = issueArray[voteCount][winningOption].effect;
+			let resultTitle = issueArray[voteCount][winningOption].title;
+			let resultMessage = issueArray[voteCount][winningOption].message;
+			
+			
+			Town.findOne({}, (error, town) => {
+				let population = town.population;
+				let votePayout = 100 + town.town_score;
+				
+				result.forEach((effect) => {
+					if(effect.functionName === "changeTownScore") {
+						changeTownScore(effect.amount);
+					} else if (effect.functionName === "changeUserMoney") {
+						changeUserMoney(effect.method, effect.sampleSize, effect.amount);
+					}
+				});
+				
+				changeUserMoney('all', 0, votePayout);
+				let votePercentage = Math.floor((data.majorityVotes / population) * 100);
+				socket.emit('vote_rundown', {
+					votePercentage: votePercentage,
+					resultTitle: resultTitle,
+					resultMessage: resultMessage,
+					votePayout: votePayout
+				});		
+			});	
 }
 
 /**** Stopwatch Instantiation ****/
