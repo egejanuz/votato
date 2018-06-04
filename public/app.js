@@ -1,7 +1,7 @@
 /**** SETUP ****/
 $(document).ready(function(){
 	//connect to socket.io
-	var socket = io.connect('http://localhost:3000');
+	var socket = io.connect(window.location.hostname);
 
 	//default view state
 	$('.edit-profile-modal').show();

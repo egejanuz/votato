@@ -9,8 +9,11 @@ const app = express();
 
 // Middlewares //
 app.use(express.static('public'));
+
 //Listen on port 3000
-server = app.listen(3000);
+let port = process.env.PORT || 5000;
+server = app.listen(port);
+
 //Routes
 app.get('/', (req, res) => {
 	res.sendFile(__dirname + '/index.html');
