@@ -664,7 +664,7 @@ let tallyVotes = function () {
 
 			changeUserMoney('all', 0, votePayout);
 			let votePercentage = Math.floor((majorityVotes / population) * 100);
-			socket.emit('vote_rundown', {
+			io.sockets.emit('vote_rundown', {
 				votePercentage: votePercentage,
 				resultTitle: resultTitle,
 				resultMessage: resultMessage,
