@@ -1,9 +1,9 @@
 /******** SETUP ********/
 
 // Stopwatch Instantiation //
-var util    = require('util'),  
-    events  = require('events'),
-    _       = require('underscore');
+var util = require('util'),
+	events = require('events'),
+	_ = require('underscore');
 
 // Express Instantiation //
 const express = require('express');
@@ -33,84 +33,84 @@ mongoose.connect('mongodb://enkomaun:Songoku7@ds263639.mlab.com:63639/heroku_xdf
 mongoose.connection.on('error', console.error.bind(console, 'connection error'));
 
 /******** STOPWATCH ********/
-function Stopwatch() {  
-    if(false === (this instanceof Stopwatch)) {
-        return new Stopwatch();
-    }
+function Stopwatch() {
+	if (false === (this instanceof Stopwatch)) {
+		return new Stopwatch();
+	}
 
-	this.clockStart = 360000;
-    this.hour = 3600000;
-    this.minute = 60000;
-    this.second = 1000;
-    this.time = this.clockStart;
-    this.interval = undefined;
+	this.clockStart =  15000; //360000;
+	this.hour = 3600000;
+	this.minute = 60000;
+	this.second = 1000;
+	this.time = this.clockStart;
+	this.interval = undefined;
 
-    events.EventEmitter.call(this);
+	events.EventEmitter.call(this);
 
-    // Use Underscore to bind all of our methods
-    // to the proper context
-    _.bindAll(this, 'start', 'stop', 'reset', 'onTick');
+	// Use Underscore to bind all of our methods
+	// to the proper context
+	_.bindAll(this, 'start', 'stop', 'reset', 'onTick');
 };
 
 /**** Inherit from EventEmitter ****/
 util.inherits(Stopwatch, events.EventEmitter);
 
 /**** Methods ****/
-Stopwatch.prototype.start = function() {  
-    if (this.interval) {
-        return;
-    }
-    this.interval = setInterval(this.onTick, this.second);
-    this.emit('start:stopwatch');
+Stopwatch.prototype.start = function () {
+	if (this.interval) {
+		return;
+	}
+	this.interval = setInterval(this.onTick, this.second);
+	this.emit('start:stopwatch');
 };
 
-Stopwatch.prototype.stop = function() {  
-    if (this.interval) {
-        clearInterval(this.interval);
-        this.interval = undefined;
-        this.emit('stop:stopwatch');
-    }
+Stopwatch.prototype.stop = function () {
+	if (this.interval) {
+		clearInterval(this.interval);
+		this.interval = undefined;
+		this.emit('stop:stopwatch');
+	}
 };
 
-Stopwatch.prototype.reset = function() {  
-    this.time = this.clockStart;
-    this.emit('reset:stopwatch', this.formatTime(this.time));
+Stopwatch.prototype.reset = function () {
+	this.time = this.clockStart;
+	this.emit('reset:stopwatch', this.formatTime(this.time));
 };
 
-Stopwatch.prototype.onTick = function() {  
-    this.time -= this.second;
+Stopwatch.prototype.onTick = function () {
+	this.time -= this.second;
 
-    var formattedTime = this.formatTime(this.time);
-    this.emit('tick:stopwatch', formattedTime);
+	var formattedTime = this.formatTime(this.time);
+	this.emit('tick:stopwatch', formattedTime);
 
-    if (this.time === -1000) {
-        this.reset();
-    }
+	if (this.time === -1000) {
+		this.reset();
+	}
 };
 
-Stopwatch.prototype.formatTime = function(time) {  
-    var remainder = time,
-        numMinutes,
-        numSeconds,
-        output = "";
+Stopwatch.prototype.formatTime = function (time) {
+	var remainder = time,
+		numMinutes,
+		numSeconds,
+		output = "";
 
-    numMinutes = String(parseInt(remainder / this.minute, 10));
-    remainder -= this.minute * numMinutes;
+	numMinutes = String(parseInt(remainder / this.minute, 10));
+	remainder -= this.minute * numMinutes;
 
-    numSeconds = String(parseInt(remainder / this.second, 10));
+	numSeconds = String(parseInt(remainder / this.second, 10));
 
-    output = _.map([numMinutes, numSeconds], function(str) {
-        if (str.length === 1) {
-            str = "0" + str;
-        }
-        return str;
-    }).join(":");
+	output = _.map([numMinutes, numSeconds], function (str) {
+		if (str.length === 1) {
+			str = "0" + str;
+		}
+		return str;
+	}).join(":");
 
-    return output;
+	return output;
 };
 
-Stopwatch.prototype.getTime = function() {  
-    return this.formatTime(this.time);
+Stopwatch.prototype.getTime = function () {
+	return this.formatTime(this.time);
 };
 
 /******** DATABASE ********/
@@ -164,7 +164,16 @@ TownSchema.statics.updateStats = (property, action, data) => {
 }
 
 UsersSchema.statics.updateMoney = function (user, action, data) {
-	User.update({socketID: user.socketID}, {[action]: {money: data}, $push: {money_graph: data}}, (error) => {
+	User.update({
+		socketID: user.socketID
+	}, {
+		[action]: {
+			money: data
+		},
+		$push: {
+			money_graph: data
+		}
+	}, (error) => {
 		if (error) throw error;
 		User.findOne({
 			socketID: user.socketID
@@ -176,7 +185,65 @@ UsersSchema.statics.updateMoney = function (user, action, data) {
 		});
 	});
 
-	Town.updateStats('gdp', '$inc', data);	
+	Town.updateStats('gdp', '$inc', data);
+}
+
+let changeUserMoney = function (method, sampleSize, amount) {
+	if (method === "all") {
+		User.find({
+			visible: true
+		}, (error, result) => {
+			if (error) throw error;
+			result.forEach((user) => {
+				User.updateMoney(user, '$inc', amount);
+			});
+		});
+	} else if (method === "random") {
+		User.findRandom({
+			visible: true
+		}, {}, {
+			limit: sampleSize
+		}, (error, result) => {
+			if (error) throw error;
+			result.forEach((user) => {
+				User.updateMoney(user, '$inc', amount);
+			});
+		});
+	} else if (method === "richest") {
+		User.find({
+			visible: true
+		}).sort({
+			money: -1
+		}).slice('money', 5).exec((error, result) => {
+			if (error) throw error;
+			for (let i = 0; i < result.length; i++) {
+				User.updateMoney(result[i], '$inc', amount);
+			}
+		});
+
+	} else if (method === "poorest") {
+		User.find({
+			visible: true
+		}).sort({
+			money: 1
+		}).slice('money', 5).exec((error, result) => {
+			if (error) throw error;
+			for (let i = 0; i < result.length; i++) {
+				User.updateMoney(result[i], '$inc', amount);
+			}
+		});
+	}
+}
+
+let changeTownScore = function (amount) {
+	Town.update({}, {
+		$push: {
+			town_score_graph: amount
+		}
+	}, (error) => {
+		Town.updateStats('town_score', '$inc', amount);
+	});
+
 }
 
 /**** Models ****/
@@ -217,10 +284,17 @@ let issueArray = [
 			'Crowdfund a reforestation effort.',
 			`<h3><strong>CHIP IN, EVERYBODY:</strong> Everyone loses 100p.</h3>
 			<h3><strong>KEEP IT GREEN:</strong> Increases town score by 10.</h3>`,
-			`everyone chipped in 100p, but the Town Score increased by 10!`,
-			[
-				{ functionName: 'changeUserMoney', method: 'all', sampleSize: '', amount: -100 },
-				{ functionName: 'changeTownScore', amount: 10 }
+			`everyone chipped in 100p, but the Town Score increased by 10!`, [
+				{
+					functionName: 'changeUserMoney',
+					method: 'all',
+					sampleSize: '',
+					amount: -100
+				},
+				{
+					functionName: 'changeTownScore',
+					amount: 10
+				}
 			]
 		),
 		new Option(
@@ -228,11 +302,23 @@ let issueArray = [
 			`<h3><strong>AND YOU GET A HOME:</strong> 3 random people gain 100p.</h3>
 			<h3><strong>KA-CHING!:</strong> The richest 3 people gain 200p.</strong></h3>
 			<h3><strong>IT'S ALL CHARCOAL:</strong> Decreases town score by 10.</h3>`,
-			`the town score decreased by 10, but 8 citizens' fortunes grew by up to 200p!`,
-			[
-				{ functionName: 'changeUserMoney', method: 'random', sampleSize: 3, amount: 100 },
-				{ functionName: 'changeUserMoney', method: 'richest', sampleSize: 3, amount: 200 },
-				{ functionName: 'changeTownScore', amount: -10 }
+			`the town score decreased by 10, but 8 citizens' fortunes grew by up to 200p!`, [
+				{
+					functionName: 'changeUserMoney',
+					method: 'random',
+					sampleSize: 3,
+					amount: 100
+				},
+				{
+					functionName: 'changeUserMoney',
+					method: 'richest',
+					sampleSize: 3,
+					amount: 200
+				},
+				{
+					functionName: 'changeTownScore',
+					amount: -10
+				}
 			]
 		)
 	),
@@ -245,11 +331,23 @@ let issueArray = [
 			`<h3><strong>WALLET BURNER:</strong> Everyone loses 50p.</h3>
 			<h3><strong>HOP IN, EVERYONE:</strong> 5 random people gain 100p.</strong></h3>
 			<h3><strong>GAS GUZZLERS:</strong> Decreases town score by 10.</h3>`,
-			`everyone chipped in 50p, resulting in a public transit system that fits the needs of everyone!`,
-			[
-				{ functionName: 'changeUserMoney', method: 'random', sampleSize: 5, amount: 100 },
-				{ functionName: 'changeUserMoney', method: 'all', sampleSize: '', amount: -50 },
-				{ functionName: 'changeTownScore', amount: -10 }
+			`everyone chipped in 50p, resulting in a public transit system that fits the needs of everyone!`, [
+				{
+					functionName: 'changeUserMoney',
+					method: 'random',
+					sampleSize: 5,
+					amount: 100
+				},
+				{
+					functionName: 'changeUserMoney',
+					method: 'all',
+					sampleSize: '',
+					amount: -50
+				},
+				{
+					functionName: 'changeTownScore',
+					amount: -10
+				}
 			]
 		),
 		new Option(
@@ -257,40 +355,68 @@ let issueArray = [
 			`<h3><strong>WALLET BURNER:</strong> Everyone loses 200p.</h3>
 			<h3><strong>FAST URBAN COMMUTE:</strong> 3 random people gain 100p.</strong></h3>
 			<h3><strong>CLEAN TRANSIT:</strong> Increases town score by 10.</h3>`,
-			`everyone chipped in 200p, resulting in better, greener commutes for urban residents!`,
-			[
-				{ functionName: 'changeUserMoney', method: 'random', sampleSize: 3, amount: 100 },
-				{ functionName: 'changeUserMoney', method: 'all', sampleSize: '', amount: -200 },
-				{ functionName: 'changeTownScore', amount: 10 }
+			`everyone chipped in 200p, resulting in better, greener commutes for urban residents!`, [
+				{
+					functionName: 'changeUserMoney',
+					method: 'random',
+					sampleSize: 3,
+					amount: 100
+				},
+				{
+					functionName: 'changeUserMoney',
+					method: 'all',
+					sampleSize: '',
+					amount: -200
+				},
+				{
+					functionName: 'changeTownScore',
+					amount: 10
+				}
 			]
 		)
 	),
-	
+
 	//Issue #3
 	new Issue(
 		'Save the Cods',
 		'Votatopia is a fishing town! Hobbyists and professionals alike go over to the coast to fish almost every day. However, it has gotten to the point that overfishing has led to the <strong>Potato Cod</strong>, a local delicacy, becoming endangered. Environmentalists call for the fish to be <strong>preserved by creating no-fish zones</strong>, while fishers whose livelihoods depend on fishing potato cod think that <strong>fishing should go on without limitations.</strong> What should be done?',
 		new Option(
 			'Preserve the fish.',
-			
+
 			`<h3><strong>NEW PRESERVATIONS:</strong> Everyone loses 100p.</h3>
 			<h3><strong>NO MORE FISHING:</strong> 3 random people lose 200p.</strong></h3>
 			<h3><strong>HEALTHY ECOSYSTEM:</strong> Town score remains the same.</h3>`,
-			
-			'everyone chipped in to create preservation sites around fishing spots, conserving the environment at the expense of the local fisherpotatoes.',
-			[
-				{ functionName: 'changeUserMoney', method: 'all', sampleSize: '', amount: -100 },
-				{ functionName: 'changeUserMoney', method: 'random', sampleSize: 3, amount: -200 },
+
+			'everyone chipped in to create preservation sites around fishing spots, conserving the environment at the expense of the local fisherpotatoes.', [
+				{
+					functionName: 'changeUserMoney',
+					method: 'all',
+					sampleSize: '',
+					amount: -100
+				},
+				{
+					functionName: 'changeUserMoney',
+					method: 'random',
+					sampleSize: 3,
+					amount: -200
+				},
 			]
 		),
 		new Option(
 			'Eat the fish.',
 			`<h3><strong>COD ECONOMICS:</strong> Everyone gains 150p.</h3>
 			<h3><strong>NATURAL RAMIFICATIONS:</strong> Town score decreased by 10.</h3>`,
-			'the popular local activity of fishing was preserved, but the environmental costs remain to be seen.',
-			[
-				{ functionName: 'changeUserMoney', method: 'all', sampleSize: '', amount: 100 },
-				{ functionName: 'changeTownScore', amount: -10 }
+			'the popular local activity of fishing was preserved, but the environmental costs remain to be seen.', [
+				{
+					functionName: 'changeUserMoney',
+					method: 'all',
+					sampleSize: '',
+					amount: 100
+				},
+				{
+					functionName: 'changeTownScore',
+					amount: -10
+				}
 			]
 		)
 	),
@@ -302,24 +428,38 @@ let issueArray = [
 			'Fund aid through taxpayer money.',
 			`<h3><strong>CHIP IN, EVERYONE:</strong> Everyone loses 100p.</h3>
 			<h3><strong>STILL FLOODED:</strong> Decreases town score by 10.</h3>`,
-			'the emergency fund is secured, but the town is still flooded, and loses 10 Town Score.',
-			[
-				{ functionName: 'changeUserMoney', method: 'all', sampleSize: '', amount: -100 },
-				{ functionName: 'changeTownScore', amount: -10 },
+			'the emergency fund is secured, but the town is still flooded, and loses 10 Town Score.', [
+				{
+					functionName: 'changeUserMoney',
+					method: 'all',
+					sampleSize: '',
+					amount: -100
+				},
+				{
+					functionName: 'changeTownScore',
+					amount: -10
+				},
 			]
 		),
 		new Option(
 			'Fund aid through donations.',
 			`<h3><strong>BIG CHECKS:</strong> The richest 3 people lose 250p.</h3>
 			<h3><strong>STILL FLOODED:</strong> Decreases town score by 10.</h3>`,
-			'the emergency fund is secured, but the town is still flooded, and loses 10 Town Score.',
-			[
-				{ functionName: 'changeUserMoney', method: 'richest', sampleSize: 3, amount: -250 },
-				{ functionName: 'changeTownScore', amount: -10 }
+			'the emergency fund is secured, but the town is still flooded, and loses 10 Town Score.', [
+				{
+					functionName: 'changeUserMoney',
+					method: 'richest',
+					sampleSize: 3,
+					amount: -250
+				},
+				{
+					functionName: 'changeTownScore',
+					amount: -10
+				}
 			]
 		)
 	),
-	
+
 	//Issue #5
 	new Issue(
 		'Dampened Efforts',
@@ -328,23 +468,32 @@ let issueArray = [
 			'Rehouse the survivors.',
 			`<h3><strong>SAVE THE NEEDY:</strong> Nobody loses anything!</h3>
 			<h3><strong>WRECKED NEIGHBORHOOD:</strong> Decreases town score by 10.</h3>`,
-			'the aid program succeeded in saving the survivors, but the neighborhood was left in a destitute condition, reducing the Town Score by 10.',
-			[
-				{ functionName: 'changeTownScore', amount: -10 },
+			'the aid program succeeded in saving the survivors, but the neighborhood was left in a destitute condition, reducing the Town Score by 10.', [
+				{
+					functionName: 'changeTownScore',
+					amount: -10
+				},
 			]
 		),
 		new Option(
 			'Restore the neighborhood.',
 			`<h3><strong>MASS PROPERTY LOSS:</strong> The poorest 3 people lose 250p.</h3>
 			<h3><strong>SAVE THE TOWN:</strong> Increases town score by 10.</h3>`,
-			'the neighborhood was saved, but its residents were not, reducing their funds by 250p.',
-			[
-				{ functionName: 'changeUserMoney', method: 'poorest', sampleSize: 3, amount: -250 },
-				{ functionName: 'changeTownScore', amount: 10 }
+			'the neighborhood was saved, but its residents were not, reducing their funds by 250p.', [
+				{
+					functionName: 'changeUserMoney',
+					method: 'poorest',
+					sampleSize: 3,
+					amount: -250
+				},
+				{
+					functionName: 'changeTownScore',
+					amount: 10
+				}
 			]
 		)
 	),
-		
+
 	//Issue #6
 	new Issue(
 		'Third Wave Coffee Shops',
@@ -354,11 +503,23 @@ let issueArray = [
 			`<h3><strong>FOR THE PEOPLE:</strong> 3 random people gain 100p.</h3>
 			<h3><strong>LOSS ON INVESTMENT:</strong> The richest 3 people lose 300p.</h3>
 			<h3><strong>IS THE TOWN BETTER OFF?:</strong> Increases town score by a random amount.</h3>`,
-			'the residents of the gentrified area got to keep their homes, gaining 100p. However, investments in the area were stifled, and investors lost 300p.',
-			[
-				{ functionName: 'changeUserMoney', method: 'random', sampleSize: 3, amount: 100 },
-				{ functionName: 'changeUserMoney', method: 'richest', sampleSize: 3, amount: -300 },
-				{ functionName: 'changeTownScore', amount: Math.floor(Math.random() * 10 + 1) }
+			'the residents of the gentrified area got to keep their homes, gaining 100p. However, investments in the area were stifled, and investors lost 300p.', [
+				{
+					functionName: 'changeUserMoney',
+					method: 'random',
+					sampleSize: 3,
+					amount: 100
+				},
+				{
+					functionName: 'changeUserMoney',
+					method: 'richest',
+					sampleSize: 3,
+					amount: -300
+				},
+				{
+					functionName: 'changeTownScore',
+					amount: Math.floor(Math.random() * 10 + 1)
+				}
 			]
 		),
 		new Option(
@@ -366,15 +527,27 @@ let issueArray = [
 			`<h3><strong>DRIVEN OUT:</strong> 3 random people lose 200p.</h3>
 			<h3><strong>THE RICH GET RICHER:</strong> The richest 3 people gain 300p.</h3>
 			<h3><strong>IS THE TOWN BETTER OFF?:</strong> Increases town score by a random amount.</h3>`,
-			'investments in the town continue to grow, enriching current investors by 300p. However, some of the original residents of the area were driven out of their homes, and lost 200p.',
-			[
-				{ functionName: 'changeUserMoney', method: 'random', sampleSize: 3, amount: -200 },
-				{ functionName: 'changeUserMoney', method: 'richest', sampleSize: 3, amount: 300 },
-				{ functionName: 'changeTownScore', amount: Math.floor(Math.random() * 10 + 1) }
+			'investments in the town continue to grow, enriching current investors by 300p. However, some of the original residents of the area were driven out of their homes, and lost 200p.', [
+				{
+					functionName: 'changeUserMoney',
+					method: 'random',
+					sampleSize: 3,
+					amount: -200
+				},
+				{
+					functionName: 'changeUserMoney',
+					method: 'richest',
+					sampleSize: 3,
+					amount: 300
+				},
+				{
+					functionName: 'changeTownScore',
+					amount: Math.floor(Math.random() * 10 + 1)
+				}
 			]
 		)
 	),
-	
+
 	//Issue #7
 	new Issue(
 		'Trash, Trash Everywhere',
@@ -383,45 +556,65 @@ let issueArray = [
 			'Burn the trash.',
 			`<h3><strong>POWER SURPLUS:</strong> Everyone gains 100p.</h3>
 			<h3><strong>SMOG AND GRIME:</strong> Decreases town score by 10.</h3>`,
-			'we began burning the *cough* trash away, generating a lot of surplus *cough* energy! Everyone gains 100p out of the *cough* surplus, but the town score was decreased by 10 due to *cough* environmental damage.',
-			[
-				{ functionName: 'changeUserMoney', method: 'all', sampleSize: '', amount: 100 },
-				{ functionName: 'changeTownScore', amount: -10 }
+			'we began burning the *cough* trash away, generating a lot of surplus *cough* energy! Everyone gains 100p out of the *cough* surplus, but the town score was decreased by 10 due to *cough* environmental damage.', [
+				{
+					functionName: 'changeUserMoney',
+					method: 'all',
+					sampleSize: '',
+					amount: 100
+				},
+				{
+					functionName: 'changeTownScore',
+					amount: -10
+				}
 			]
 		),
 		new Option(
 			'Recycle the trash.',
 			`<h3><strong>THIS IS COSTLY:</strong> Everyone loses 150p.</h3>
 			<h3><strong>FRESH AIR:</strong> Increases town score by 10.</h3>`,
-			'a sound investment of 150p was made by the whole town to build a recycling facilities, which cleaned up the town so much that its Town Score was increased by 10!',
-			[
-				{ functionName: 'changeUserMoney', method: 'all', sampleSize: '', amount: -150 },
-				{ functionName: 'changeTownScore', amount: 10 }
+			'a sound investment of 150p was made by the whole town to build a recycling facilities, which cleaned up the town so much that its Town Score was increased by 10!', [
+				{
+					functionName: 'changeUserMoney',
+					method: 'all',
+					sampleSize: '',
+					amount: -150
+				},
+				{
+					functionName: 'changeTownScore',
+					amount: 10
+				}
 			]
 		)
 	),
-	
+
 	//Issue #8
-	new Issue (
+	new Issue(
 		`Potato Flu`,
 		`A particularly awful strain of the potato flu has broken out in town! Things look pretty bad, most of those infected have been hospitalized, and are highly infectious. The town has to choose between two options to contain the disease before it spreads to everyone: either <strong>quarantine the infected</strong> until they get better, or <strong>initiate a vaccination program</strong> that will immunize the whole populace before they are infected.`,
 		new Option(
 			'Quarantine the sick.',
 			`<h3><strong>TOWN IN QUARANTINE: </strong>Decreases town score by 10.</h3>`,
-			'',
-			[
-				{ functionNmae: 'changeTownScore', amount: -10 }
+			'', [
+				{
+					functionNmae: 'changeTownScore',
+					amount: -10
+				}
 			]
-		
+
 		),
 		new Option(
 			'Vaccinate everyone.',
 			`<h3><strong>COSTLY EFFORT: </strong>Everyone loses 100p.</h3>`,
-			'',
-			[
-				{ functionName: 'changeUserMoney', method: 'all', sampleSize: '', amount: -100 }
+			'', [
+				{
+					functionName: 'changeUserMoney',
+					method: 'all',
+					sampleSize: '',
+					amount: -100
+				}
 			]
-		
+
 		)
 	)
 ];
@@ -433,7 +626,7 @@ let votesForB = 0;
 
 /**** Vote System Countdown ****/
 
-let renderNewIssue = function() {
+let renderNewIssue = function () {
 	let issue = issueArray[voteCount];
 	io.sockets.emit('new-issue', {
 		title: issue.title,
@@ -447,41 +640,40 @@ let renderNewIssue = function() {
 	});
 }
 
-let tallyVotes = function() {
-	let winningOption ='';
+let tallyVotes = function () {
+	let winningOption = '';
 	if (!(votesForA === 0 && votesForB === 0)) {
 		winningOption = (votesForA > votesForB) ? "firstOption" : "secondOption";
 		let majorityVotes = (votesForA > votesForB) ? votesForA : votesForB;
+		let result = issueArray[voteCount][winningOption].effect;
+		let resultTitle = issueArray[voteCount][winningOption].title;
+		let resultMessage = issueArray[voteCount][winningOption].message;
+
+
+		Town.findOne({}, (error, town) => {
+			let population = town.population;
+			let votePayout = 100 + town.town_score;
+
+			result.forEach((effect) => {
+				if (effect.functionName === "changeTownScore") {
+					changeTownScore(effect.amount);
+				} else if (effect.functionName === "changeUserMoney") {
+					changeUserMoney(effect.method, effect.sampleSize, effect.amount);
+				}
+			});
+
+			changeUserMoney('all', 0, votePayout);
+			let votePercentage = Math.floor((data.majorityVotes / population) * 100);
+			socket.emit('vote_rundown', {
+				votePercentage: votePercentage,
+				resultTitle: resultTitle,
+				resultMessage: resultMessage,
+				votePayout: votePayout
+			});
+		});
 	}
 	votesForA = 0;
-	votesForB = 0;	
-	
-	let result = issueArray[voteCount][winningOption].effect;
-			let resultTitle = issueArray[voteCount][winningOption].title;
-			let resultMessage = issueArray[voteCount][winningOption].message;
-			
-			
-			Town.findOne({}, (error, town) => {
-				let population = town.population;
-				let votePayout = 100 + town.town_score;
-				
-				result.forEach((effect) => {
-					if(effect.functionName === "changeTownScore") {
-						changeTownScore(effect.amount);
-					} else if (effect.functionName === "changeUserMoney") {
-						changeUserMoney(effect.method, effect.sampleSize, effect.amount);
-					}
-				});
-				
-				changeUserMoney('all', 0, votePayout);
-				let votePercentage = Math.floor((data.majorityVotes / population) * 100);
-				socket.emit('vote_rundown', {
-					votePercentage: votePercentage,
-					resultTitle: resultTitle,
-					resultMessage: resultMessage,
-					votePayout: votePayout
-				});		
-			});	
+	votesForB = 0;
 }
 
 /**** Stopwatch Instantiation ****/
@@ -501,7 +693,7 @@ stopwatch.on('tick:stopwatch', function (time) {
 stopwatch.on('reset:stopwatch', function (time) {
 	//Tally votes
 	tallyVotes();
-	
+
 	//Send resetted time to clients
 	io.sockets.emit('time', {
 		time: time
@@ -510,7 +702,7 @@ stopwatch.on('reset:stopwatch', function (time) {
 	//Increase vote count
 	voteCount++;
 	if (voteCount > (issueArray.length - 1)) voteCount = 0;
-	
+
 	//Render new issue
 	renderNewIssue();
 });
@@ -522,7 +714,7 @@ stopwatch.start();
 
 // Connect to Mongoose //
 mongoose.connection.once('open', function () {
-	
+
 	// STEP 1: Initialize Town //
 	const town = new Town({
 		name: "Votatopia",
@@ -536,7 +728,7 @@ mongoose.connection.once('open', function () {
 
 	// STEP 2: Connect to Socket.io //
 	io.on('connection', (socket) => {
-		
+
 		//Initialize Countdown and First Issue
 		let issue = issueArray[voteCount];
 		socket.emit('new-issue', {
@@ -549,9 +741,9 @@ mongoose.connection.once('open', function () {
 			optionTooltipB: issue.secondOption.tooltip,
 			optionEffectB: issue.secondOption.effect
 		});
-		
+
 		/**** Initialization Methods ****/
-		let populateTown = function() {
+		let populateTown = function () {
 			User.find({}).lean().exec(function (error, result) {
 				result.forEach((user) => {
 					if (user.visible) {
@@ -564,7 +756,7 @@ mongoose.connection.once('open', function () {
 			});
 		}
 
-		let assignMoney = function() {
+		let assignMoney = function () {
 			let rng = Math.floor(Math.random() * (6));
 			switch (rng) {
 				case 0:
@@ -582,114 +774,37 @@ mongoose.connection.once('open', function () {
 		}
 
 		/**** Vote System Methods ****/
-		let changeUserMoney = function(method, sampleSize, amount) {
-			if (method === "all") {
-				User.find({
-					visible: true
-				}, (error, result) => {
-					if (error) throw error;
-					result.forEach((user) => {
-						User.updateMoney(user, '$inc', amount);
-					});
-				});
-			} else if (method === "random") {
-				User.findRandom({
-					visible: true
-				}, {}, {
-					limit: sampleSize
-				}, (error, result) => {
-					if (error) throw error;
-					result.forEach((user) => {
-						User.updateMoney(user, '$inc', amount);
-					});
-				});
-			} else if (method === "richest") {
-				User.find({
-					visible: true
-				}).sort({
-					money: -1
-				}).slice('money', 5).exec((error, result) => {
-					if (error) throw error;
-					for (let i = 0; i < result.length; i++) {
-						User.updateMoney(result[i], '$inc', amount);
-					}
-				});
 
-			} else if (method === "poorest") {
-				User.find({
-					visible: true
-				}).sort({
-					money: 1
-				}).slice('money', 5).exec((error, result) => {
-					if (error) throw error;
-					for (let i = 0; i < result.length; i++) {
-						User.updateMoney(result[i], '$inc', amount);
-					}
-				});
-			}
-		}
 
-		let changeTownScore = function(amount) {
-			Town.update({}, {$push: {town_score_graph: amount}}, (error) => {
-				Town.updateStats('town_score', '$inc', amount);
-			});
-			
-		}
-		
 		/**** VOTE: Response and Effect Handling ****/
-		
+
 		//tally responses for tallyVote function
 		socket.on('client-vote', (data) => {
-			if(data.decision === 'option-A') {
+			if (data.decision === 'option-A') {
 				votesForA++;
 				votesForB--;
 			} else if (data.decision === 'option-B') {
 				votesForA--;
 				votesForB++;
-			}	
+			}
 		});
-		
+
 		socket.on('client-vote:first', (data) => {
-			if(data.decision === 'option-A') {
+			if (data.decision === 'option-A') {
 				votesForA++;
 			} else if (data.decision === 'option-B') {
 				votesForB++;
-			}	
+			}
 		});
-		
+
 		//Handle Vote End
 		socket.on('vote_finished', (data) => {
-			let result = issueArray[data.voteCount][data.winningOption].effect;
-			let resultTitle = issueArray[data.voteCount][data.winningOption].title;
-			let resultMessage = issueArray[data.voteCount][data.winningOption].message;
-			
-			
-			Town.findOne({}, (error, town) => {
-				let population = town.population;
-				let votePayout = 100 + town.town_score;
-				
-				result.forEach((effect) => {
-					if(effect.functionName === "changeTownScore") {
-						changeTownScore(effect.amount);
-					} else if (effect.functionName === "changeUserMoney") {
-						changeUserMoney(effect.method, effect.sampleSize, effect.amount);
-					}
-				});
-				
-				changeUserMoney('all', 0, votePayout);
-				let votePercentage = Math.floor((data.majorityVotes / population) * 100);
-				socket.emit('vote_rundown', {
-					votePercentage: votePercentage,
-					resultTitle: resultTitle,
-					resultMessage: resultMessage,
-					votePayout: votePayout
-				});		
-			});		
+
 		});
-		
-		
+
+
 		populateTown(); // add existing user avatars to the city
-		
+
 
 		// STEP 3: Initialize User //
 		//Assign default values
@@ -708,7 +823,7 @@ mongoose.connection.once('open', function () {
 			money: socket.money,
 			visible: true
 		});
-		
+
 		user.save((error) => {
 			Town.updateStats('population', '$inc', 1);
 			Town.updateStats('town_score', '$inc', 0);
@@ -781,7 +896,7 @@ mongoose.connection.once('open', function () {
 				}
 			});
 		});
-		
+
 
 		/**** DISCONNECTION ****/
 		socket.once('disconnect', (socket) => {
