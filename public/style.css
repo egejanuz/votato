@@ -75,7 +75,7 @@ strong {
 	background: url(assets/city/clouds.svg) repeat 0 0;
 	width: 100%;
 	margin: 0;
-	height: 325px;
+	height: 400px;
 	-webkit-animation: slide 90s linear infinite;
 	animation: slide 90s linear infinite;
 }
