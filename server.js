@@ -1,7 +1,7 @@
 /******** SETUP ********/
 
 // Stopwatch Instantiation //
-var Stopwatch = require('./models/Stopwatch');
+var Stopwatch = require('./models/Stopwatch.js');
 
 // Express Instantiation //
 const express = require('express');
