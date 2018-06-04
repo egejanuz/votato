@@ -16,7 +16,7 @@ server = app.listen(port);
 
 //Routes
 app.get('/', (req, res) => {
-	res.sendFile(__dirname + '/index.html');
+	res.sendFile('./public/index.html');
 });
 
 // Socket.io Instantiation //
