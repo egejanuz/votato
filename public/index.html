@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta http-equiv="Content-Type" const="text/html;charset=UTF-8" />
+	<link rel="stylesheet" href="reset.min.css">
+	<link rel="stylesheet" href="assets/votato-kit/votato-kit.css">
+	<link rel="stylesheet" href="style.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+	<title>Votato</title>
+</head>
+
+<body>
+	<div id="main-grid">
+		<!--SIDEBAR-->
+		<div id="sidebar">
+			<div id="top-bar">
+				<div id="profile-open-button">
+					<img class="user-info-pp" src="assets/thumbnails/m_neutral_thumb.svg" alt="User profile thumbnail">
+					<div id="user-info">
+						<p class="user-info-name">Anonymous</p>
+						<p class="user-info-money"></p>
+					</div>
+				</div>
+				<button id="help-open-button">?</button>
+			</div>
+			<div id="info-container">
+
+				<!--VIEWS-->
+				<div id="town-view">
+					<h1 id="name-indicator">VOTATOPIA</h1>
+					<h2>POPULATION</h2>
+					<p id="population-indicator">0</p>
+					<h2>TOWN SCORE</h2>
+					<p id="town-score-indicator">0</p>
+					<h2>GDP</h2>
+					<p id="gdp-indicator">0</p>
+					<h2>TIME UNTIL NEXT VOTE</h2>
+					<p class="vote-countdown-timer"></p>
+				</div>
+
+				<div id="chat-view">
+					<div id="chatroom">
+						<div id="chatroom-buffer"></div>
+					</div>
+					<div id="input-zone">
+						<input id="message-input" type="text" autocomplete="off" placeholder="Say something..." />
+						<button id="send-message" type="button"></button>
+					</div>
+				</div>
+
+				<div id="vote-view">
+					<div id="vote-rundown">
+						<h5>THE BALLOTS ARE IN!</h5>
+						<p class="first-p"></p>
+						<img src="assets/graphics/vote-end-graphic.svg" alt="The vote's over, hurray!">
+						<p class="second-p"></p>
+						<button class="modal-close-button" id="vote-rundown-close">ONTO THE NEXT ONE!</button>
+						
+					</div>
+					<div id="vote-grid">
+						<div id="issue-container"></div>
+						<div id="countdown">
+							<h3>NEXT VOTE IN</h3>
+							<div class="vote-countdown-timer"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="nav-bar">
+				<div class="nav-button active" id="town-button"></div>
+				<div class="nav-button" id="chat-button"></div>
+				<div class="nav-button" id="vote-button"></div>
+			</div>
+		</div>
+
+		<!--PROFILE MODAL-->
+		<div class="edit-profile-modal">
+			<div class="edit-profile-container">
+				<div class="change-username">
+					<h3>SELECT USERNAME</h3>
+					<input class="username-input" type="text" value="Anonymous" maxlength="12" />
+					<h4>(max. 12 characters)</h4>
+				</div>
+				<div class="change-profile-pic">
+					<h3>SELECT AVATAR</h3>
+					<div class="carousel">
+						<button class="profile-carousel-prev"></button>
+						<div class="carousel-view"></div>
+						<button class="profile-carousel-next"></button>
+					</div>
+
+					<div class="carousel-gender-buttons">
+						<button class="carousel-male-button selected">&#9794;</button>
+						<button class="carousel-female-button">&#9792;</button>
+					</div>
+				</div>
+				<button class="modal-close-button profile-close-button">DONE!</button>
+			</div>
+		</div>
+
+		<!--HELP MODAL-->
+		<div class="help-modal">
+			<div class="help-modal-container">
+				<button type="button" class="help-carousel-prev"></button>
+				<div class="help-carousel">
+					<div class="modal-div modal-2">
+						<img src="assets/graphics/info-graphic-2.svg">
+						<p>Vote on issues as they come up on the <strong>Vote</strong> tab. Decisions voted on by a majority will take place.</p>
+						<button class="modal-close-button help-close-button">GOT IT!</button>
+					</div>
+					<div class="modal-div modal-3">
+						<img src="assets/graphics/info-graphic-3.svg">
+						<p>The outcome of the vote affects the <strong>Town Score.</strong> Watch out for additional effects as well!</p>
+						<button class="modal-close-button help-close-button">GOT IT!</button>
+					</div>
+					<div class="modal-div modal-4">
+						<img src="assets/graphics/info-graphic-4.svg">
+						<p>Make money for each vote you participate in. Higher the <strong>Town Score,</strong> higher the income!</p>
+						<button class="modal-close-button help-close-button">GOT IT!</button>
+					</div>
+					<div class="modal-div modal-5">
+						<img src="assets/graphics/info-graphic-5.svg">
+						<p>Voting is a community effort. Use the <strong>Chat</strong> tab to voice your opinions and debate with others!</p>
+						<button class="modal-close-button help-close-button">GOT IT!</button>
+					</div>
+					<div class="modal-div modal-1">
+						<h1>Welcome to Votatopia!</h1>
+						<img src="assets/graphics/info-graphic-1.svg">
+						<p>Votatopia is governed by <strong>votation.</strong> As a citizen, you must vote on the issues that concern the town.</p>
+						<button class="modal-close-button help-close-button">GOT IT!</button>
+					</div>
+				</div>
+				<button type="button" class="help-carousel-next"></button>
+			</div>
+		</div>
+		
+		<!--INTRO MODAL-->
+		<div class="intro-modal">
+			<div class="intro-modal-container">
+				<h1>VOTATO</h1>
+				<h4>Alpha v.0.1.0</h4>
+				<img>
+				<button type="button" class="modal-close-button intro-close-button">LET'S GO!</button>
+			</div>
+		</div>
+		
+		<div id="city">
+			<div id="avatar-tooltip"></div>
+			<div id="clouds"></div>
+			<div id="street"></div>
+		</div>
+	</div>
+
+	<!--JAVASCRIPT-->
+	<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+	<script src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+	<script src="jquery.countdown.min.js"></script>
+	<script src="app.js"></script>
+</body>
+
+</html>

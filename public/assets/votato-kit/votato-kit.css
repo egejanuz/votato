@@ -1,0 +1,70 @@
+/**
+ * @license
+ * MyFonts Webfont Build ID 3584533, 2018-05-21T08:09:26-0400
+ * 
+ * The fonts listed in this notice are subject to the End User License
+ * Agreement(s) entered into by the website owner. All other parties are 
+ * explicitly restricted from using the Licensed Webfonts(s).
+ * 
+ * You may obtain a valid license at the URLs below.
+ * 
+ * Webfont: AvenirNextLTPro-Bold by Linotype
+ * URL: https://www.myfonts.com/fonts/linotype/avenir-next-pro/pro-bold/
+ * Copyright: Copyright &#x00A9; 2004 - 2017 Monotype GmbH. All rights reserved.
+ * 
+ * Webfont: AvenirNextLTPro-Demi by Linotype
+ * URL: https://www.myfonts.com/fonts/linotype/avenir-next-pro/pro-demi/
+ * Copyright: Copyright &#x00A9; 2004 - 2017 Monotype GmbH. All rights reserved.
+ * 
+ * Webfont: AvenirNextLTPro-Heavy by Linotype
+ * URL: https://www.myfonts.com/fonts/linotype/avenir-next-pro/pro-heavy/
+ * Copyright: Copyright &#x00A9; 2004 - 2017 Monotype GmbH. All rights reserved.
+ * 
+ * Webfont: AvenirNextLTPro-Light by Linotype
+ * URL: https://www.myfonts.com/fonts/linotype/avenir-next-pro/pro-light/
+ * Copyright: Copyright &#x00A9; 2012 - 2017 Monotype GmbH. All rights reserved.
+ * 
+ * Webfont: AvenirNextLTPro-Medium by Linotype
+ * URL: https://www.myfonts.com/fonts/linotype/avenir-next-pro/pro-medium/
+ * Copyright: Copyright &#x00A9; 2004 - 2017 Monotype GmbH. All rights reserved.
+ * 
+ * Webfont: AvenirNextLTPro-Regular by Linotype
+ * URL: https://www.myfonts.com/fonts/linotype/avenir-next-pro/pro-regular/
+ * Copyright: Copyright &#x00A9; 2004 - 2017 Monotype GmbH. All rights reserved.
+ * 
+ * Webfont: AvenirNextLTPro-Thin by Linotype
+ * URL: https://www.myfonts.com/fonts/linotype/avenir-next-pro/pro-thin/
+ * Copyright: Copyright &#x00A9; 2012 - 2017 Monotype GmbH. All rights reserved.
+ * 
+ * 
+ * License: https://www.myfonts.com/viewlicense?type=web&buildid=3584533
+ * Licensed pageviews: 250,000
+ * 
+ * © 2018 MyFonts Inc
+*/
+
+
+/* @import must be at top of file, otherwise CSS will not work */
+@import url("//hello.myfonts.net/count/36b215");
+
+  
+@font-face {font-family: 'AvenirNextLTPro-Bold';src: url('webfonts/36B215_0_0.eot');src: url('webfonts/36B215_0_0.eot?#iefix') format('embedded-opentype'),url('webfonts/36B215_0_0.woff2') format('woff2'),url('webfonts/36B215_0_0.woff') format('woff'),url('webfonts/36B215_0_0.ttf') format('truetype');}
+ 
+  
+@font-face {font-family: 'AvenirNextLTPro-Demi';src: url('webfonts/36B215_1_0.eot');src: url('webfonts/36B215_1_0.eot?#iefix') format('embedded-opentype'),url('webfonts/36B215_1_0.woff2') format('woff2'),url('webfonts/36B215_1_0.woff') format('woff'),url('webfonts/36B215_1_0.ttf') format('truetype');}
+ 
+  
+@font-face {font-family: 'AvenirNextLTPro-Heavy';src: url('webfonts/36B215_2_0.eot');src: url('webfonts/36B215_2_0.eot?#iefix') format('embedded-opentype'),url('webfonts/36B215_2_0.woff2') format('woff2'),url('webfonts/36B215_2_0.woff') format('woff'),url('webfonts/36B215_2_0.ttf') format('truetype');}
+ 
+  
+@font-face {font-family: 'AvenirNextLTPro-Light';src: url('webfonts/36B215_3_0.eot');src: url('webfonts/36B215_3_0.eot?#iefix') format('embedded-opentype'),url('webfonts/36B215_3_0.woff2') format('woff2'),url('webfonts/36B215_3_0.woff') format('woff'),url('webfonts/36B215_3_0.ttf') format('truetype');}
+ 
+  
+@font-face {font-family: 'AvenirNextLTPro-Medium';src: url('webfonts/36B215_4_0.eot');src: url('webfonts/36B215_4_0.eot?#iefix') format('embedded-opentype'),url('webfonts/36B215_4_0.woff2') format('woff2'),url('webfonts/36B215_4_0.woff') format('woff'),url('webfonts/36B215_4_0.ttf') format('truetype');}
+ 
+  
+@font-face {font-family: 'AvenirNextLTPro-Regular';src: url('webfonts/36B215_5_0.eot');src: url('webfonts/36B215_5_0.eot?#iefix') format('embedded-opentype'),url('webfonts/36B215_5_0.woff2') format('woff2'),url('webfonts/36B215_5_0.woff') format('woff'),url('webfonts/36B215_5_0.ttf') format('truetype');}
+ 
+  
+@font-face {font-family: 'AvenirNextLTPro-Thin';src: url('webfonts/36B215_6_0.eot');src: url('webfonts/36B215_6_0.eot?#iefix') format('embedded-opentype'),url('webfonts/36B215_6_0.woff2') format('woff2'),url('webfonts/36B215_6_0.woff') format('woff'),url('webfonts/36B215_6_0.ttf') format('truetype');}
+ 
