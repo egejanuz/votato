@@ -72,10 +72,10 @@ strong {
 }
 
 #clouds {
-	background: url(assets/city/clouds.svg) repeat 0 0;
+	background: url(assets/city/clouds.svg) no-repeat 0 0;
 	width: 100%;
 	margin: 0;
-	height: 400px;
+	height: 300px;
 	-webkit-animation: slide 90s linear infinite;
 	animation: slide 90s linear infinite;
 }
