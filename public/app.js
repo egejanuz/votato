@@ -174,7 +174,7 @@ $(document).ready(function(){
 	});
 
 	$('.help-close-button').on('click', () => {
-		$('#message-input').attr('disabled', true);
+		$('#message-input').attr('disabled', false);
 		$('.help-modal').hide();
 	});
 

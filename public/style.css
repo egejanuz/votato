@@ -179,6 +179,7 @@ strong {
 	font-family: AvenirNextLTPro-Medium;
 	font-size: 1.1rem;
 	justify-self: center;
+	z-index: 4;
 }
 
 .modal-close-button:hover {
@@ -537,7 +538,7 @@ strong {
 	width: 100%;
 	display: grid;
 	height: 100%;
-	grid-template-rows: 50px 65% auto auto;
+	grid-template-rows: 50px 55% auto auto;
 }
 
 #issue-title {

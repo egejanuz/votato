@@ -38,7 +38,7 @@ function Stopwatch() {
 		return new Stopwatch();
 	}
 
-	this.clockStart =  480000;
+	this.clockStart =  300000 ;
 	this.hour = 3600000;
 	this.minute = 60000;
 	this.second = 1000;
