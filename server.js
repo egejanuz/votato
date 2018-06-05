@@ -597,7 +597,7 @@ let issueArray = [
 			`<h3><strong>TOWN IN QUARANTINE: </strong>Decreases town score by 10.</h3>`,
 			'', [
 				{
-					functionNmae: 'changeTownScore',
+					functionName: 'changeTownScore',
 					amount: -10
 				}
 			]
